@@ -17,130 +17,67 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-import sys
+import sys, os.path, logging
 
-from PyQt4 import QtCore
-try:
-    from picard.musicdns import ofa
-except ImportError:
-    ofa = None
-from picard import version_string
-from picard.const import MUSICDNS_KEY
-from picard.util import encode_filename, partial
-from picard.util.thread import proxy_to_main
+__all__ = ('create_fingerprint',)
 
 
-class OFA(QtCore.QObject):
+_plugins = ["avcodec", "directshow", "quicktime", "gstreamer"]
+_decoders = []
 
-    def __init__(self):
-        QtCore.QObject.__init__(self)
-        if not ofa:
-            self.log.warning(
-                "Libofa not found! Fingerprinting will be disabled.")
-        self._decoders = []
-        plugins = ["avcodec", "directshow", "quicktime", "gstreamer"]
-        for name in plugins:
-            try:
-                decoder = getattr(__import__("picard.musicdns." + name).musicdns, name)
-                self._decoders.append(decoder)
-            except ImportError:
-                pass
-        if not self._decoders:
-            self.log.warning(
-                "No decoders found! Fingerprinting will be disabled.")
-
-    def init(self):
-        for decoder in self._decoders:
-            decoder.init()
-
-    def done(self):
-        for decoder in self._decoders:
-            decoder.done()
-
-    def create_fingerprint(self, filename):
-        """Decode the specified file and calculate a fingerprint."""
-        print >> sys.stderr, 'create_fingerprint:', filename
-        if ofa is None:
-            return None, 0
-        filename = encode_filename(filename)
-        for decoder in self._decoders:
-            self.log.debug("Decoding using %r...", decoder.__name__)
-            try:
-                result = decoder.decode(filename)
-            except Exception:
-                continue
-            self.log.debug("Fingerprinting...")
-            if result:
-                buffer, samples, sample_rate, stereo, duration = result
-                fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
-                return fingerprint, duration
-        return None, 0
-
-    def _lookup_finished(self, handler, file, document, http, error):
+def initialize():
+    for name in _plugins:
         try:
-            puid = document.metadata[0].track[0].puid_list[0].puid[0].id
-        except (AttributeError, IndexError):
-            puid = None
-        # for some reason MusicDNS started to return these bogus PUIDs
-        if puid == '00000000-0000-0000-0000-000000000000':
-            puid = None
-        handler(file, puid)
+            decoder = getattr(__import__('musicdns.%s' % name), name)
+            _decoders.append(decoder)
+        except ImportError:
+            pass
+    if not _decoders:
+        logging.warning(
+            "No decoders found! Fingerprinting will be disabled.")
 
-    def _lookup_fingerprint(self, file, fingerprint, handler, length=0):
-        if file.state != file.PENDING:
-            handler(file, None)
-            return
-        self.tagger.window.set_statusbar_message(N_("Looking up the fingerprint for file %s..."), file.filename)
-        self.tagger.xmlws.query_musicdns(partial(self._lookup_finished, handler, file),
-            rmt='0',
-            lkt='1',
-            cid=MUSICDNS_KEY,
-            cvr="MusicBrainz Picard-%s" % version_string,
-            fpt=fingerprint,
-            dur=str(file.metadata.length or length),
-            brt=str(file.metadata.get("~#bitrate", 0)),
-            fmt=file.metadata["~format"],
-            art=file.metadata["artist"],
-            ttl=file.metadata["title"],
-            alb=file.metadata["album"],
-            tnm=file.metadata["tracknumber"],
-            gnr=file.metadata["genre"],
-            yrr=file.metadata["date"][:4])
+try:
+    import ofa
+    initialize()
+except ImportError:
+    logging.warning("Libofa not found! Fingerprinting will be disabled.")
+    ofa = None
 
-    def _create_fingerprint(self, file, handler):
-        if file.state != file.PENDING:
-            handler(file, None)
-            return
-        self.tagger.window.set_statusbar_message(N_("Creating fingerprint for file %s..."), file.filename)
-        filename = encode_filename(file.filename)
-        fingerprint = None
-        for decoder in self._decoders:
-            self.log.debug("Decoding using %r...", decoder.__name__)
-            try:
-                result = decoder.decode(filename)
-            except Exception:
-                continue
-            if result:
-                self.log.debug("Fingerprinting...")
-                buffer, samples, sample_rate, stereo, duration = result
-                fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
-                if fingerprint:
-                    proxy_to_main(self._lookup_fingerprint, file, fingerprint, handler, duration)
-                    return
-                else:
-                    break
-        proxy_to_main(handler, file, None)
 
-    def analyze(self, file, handler):
-        print >> sys.stderr, 'analyze:', file
+def create_fingerprint(filename):
+    """Compute a fingerprint from an open audio file.
+    This function may return none.
+    If the file cannot be decoded, a IOError is raised."""
 
-        if 'musicip_puid' in file.metadata:
-            handler(file, file.metadata.getall('musicip_puid')[0])
+    # Make sure the filename is encoded properly to be consumed by the decoders.
+    filename = encode_filename(filename)
+
+    # Try to decode the audio file.
+    result = None
+    for decoder in _decoders:
+        logging.debug("Decoding using %r...", decoder.__name__)
+        try:
+            trace(decoder, filename)
+            result = decoder.decode(filename)
+        except Exception:
+            continue
+    if not result:
+        raise IOError("Could not decode file '%s' with any of the available decoders: %s." %
+                      (filename, ','.join(x.__name__.split('.')[-1] for x in _decoders)))
+
+    # Create the fingerprint.
+    buffer, samples, sample_rate, stereo, duration = result
+    fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
+    return fingerprint
+
+
+def encode_filename(filename):
+    """Encode unicode strings to filesystem encoding."""
+    if isinstance(filename, unicode):
+        if os.path.supports_unicode_filenames:
+            return filename
         else:
-            if 'musicip_fingerprint' in file.metadata:
-                fingerprint = file.metadata.getall('musicip_fingerprint')[0]
-                self._lookup_fingerprint(file, fingerprint, handler)
-            elif ofa is not None:
-                self.tagger.analyze_thread.add_task(self._create_fingerprint, file, handler)
-            else:
-                handler(file, None)
+            return filename.encode(_io_encoding, 'replace')
+    else:
+        return filename
+
