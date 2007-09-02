@@ -1,0 +1,55 @@
+.. -*- coding: utf-8 -*-
+==========================================================
+   pyofa: Python Wrapper for Music DNS Library (libofa)
+==========================================================
+
+.. contents::
+..
+
+Description
+===========
+
+pyofa is a simple Python wrapper around the MusicDNS technology
+provided by MusicIP for generating PUIDs (audio fingerprints) from
+audio files (e.g. MP3, M4A, etc.).
+
+
+Dependencies
+============
+
+- `Python 2.5 <http://python.org>`_ or higher
+- MusicIP's `libofa <http://www.musicip.com/dns>`_
+
+
+Documentation
+=============
+
+- `CHANGES <CHANGES>`_
+- `TODO <TODO>`_
+
+
+
+Download
+========
+
+- `Download </downloads/snakefood/>`_
+
+
+Copyright and License
+=====================
+
+This code is distributed under the `GNU General Public License <COPYING>`_;
+
+
+Author
+======
+
+Martin Blais <blais@furius.ca>, using the code of 
+Lukáš Lalinský <lalinsky@gmail.com>
+
+  Lukáš is the author of most of the code, I just repackaged it
+  outside of Picard because I wanted to write scripts using MusicDNS
+  without a GUI application.
+
+
+
