@@ -1,4 +1,5 @@
 .. -*- coding: utf-8 -*-
+
 ==========================================================
    pyofa: Python Wrapper for Music DNS Library (libofa)
 ==========================================================
@@ -44,12 +45,14 @@ This code is distributed under the `GNU General Public License <COPYING>`_;
 Author
 ======
 
-Martin Blais <blais@furius.ca>, using the code of 
+Martin Blais <blais@furius.ca>, using the code of
 Lukáš Lalinský <lalinsky@gmail.com>
 
-  Lukáš is the author of most of the code, I just repackaged it
-  outside of Picard because I wanted to write scripts using MusicDNS
-  without a GUI application.
+.. note::
+
+   Lukáš is the author of the great majority of the code, I just
+   repackaged and simplified it outside of Picard because I wanted to
+   write scripts using MusicDNS without a GUI application.
 
 
 
