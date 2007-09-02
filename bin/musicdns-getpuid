@@ -10,9 +10,13 @@ def main():
     parser = optparse.OptionParser(__doc__.strip())
     opts, args = parser.parse_args()
 
+    musicdns.initialize()
+
     for fn in args:
         puid = musicdns.create_fingerprint(fn)
         print fn, ':', puid
+
+    musicdns.finalize()
 
 if __name__ == '__main__':
     main()

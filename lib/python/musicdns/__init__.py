@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
 #
-# Picard, the next-generation MusicBrainz tagger
-# Copyright (C) 2006 Lukáš Lalinský
+# pyofa, a wrapper around the MusicDNS libofa and service.
+# Copyright (C) 2007 Martin Blais (modifications)
+# Copyright (C) 2006 Lukáš Lalinský (original code)
 #
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -19,26 +20,42 @@
 
 import sys, os.path, logging
 
-__all__ = ('create_fingerprint',)
+__all__ = ('initialize', 'finalize',
+           'create_fingerprint', 'lookup_fingerprint')
 
 
 _plugins = ["avcodec", "directshow", "quicktime", "gstreamer"]
 _decoders = []
 
-def initialize():
+def import_decoders():
     for name in _plugins:
         try:
             decoder = getattr(__import__('musicdns.%s' % name), name)
             _decoders.append(decoder)
+
+            # Note: the reason we're not calling 'init' here is that it may be
+            # lengthy, and we want to give the change to multithreaded programs
+            # to delegate this to a background thread in order to speed up
+            # startup.
         except ImportError:
             pass
     if not _decoders:
         logging.warning(
             "No decoders found! Fingerprinting will be disabled.")
 
+def initialize():
+    "You must call this before your use the decoders."
+    for decoder in _decoders:
+        decoder.init()
+
+def finalize():
+    "You must call this after you're done using the decoders."
+    for decoder in _decoders:
+        decoder.done()
+
 try:
     import ofa
-    initialize()
+    import_decoders()
 except ImportError:
     logging.warning("Libofa not found! Fingerprinting will be disabled.")
     ofa = None
@@ -70,7 +87,6 @@ def create_fingerprint(filename):
     fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
     return fingerprint
 
-
 def encode_filename(filename):
     """Encode unicode strings to filesystem encoding."""
     if isinstance(filename, unicode):
@@ -80,4 +96,29 @@ def encode_filename(filename):
             return filename.encode(_io_encoding, 'replace')
     else:
         return filename
+
+def lookup_fingerprint(fingerprint, musicdns_key):
+    """Given the fingerprint of an audio file, lookup the PUID."""
+## FIXME: todo
+##     if file.state != file.PENDING:
+##         handler(file, None)
+##         return
+##     self.tagger.window.set_statusbar_message(N_("Looking up the fingerprint for file %s..."), file.filename)
+##     self.tagger.xmlws.query_musicdns(partial(self._lookup_finished, handler, file),
+##         rmt='0',
+##         lkt='1',
+##         cid=MUSICDNS_KEY,
+##         cvr="MusicBrainz Picard-%s" % version_string,
+##         fpt=fingerprint,
+##         dur=str(file.metadata.length or length),
+##         brt=str(file.metadata.get("~#bitrate", 0)),
+##         fmt=file.metadata["~format"],
+##         art=file.metadata["artist"],
+##         ttl=file.metadata["title"],
+##         alb=file.metadata["album"],
+##         tnm=file.metadata["tracknumber"],
+##         gnr=file.metadata["genre"],
+##         yrr=file.metadata["date"][:4])
+
+
 

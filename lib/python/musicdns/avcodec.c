@@ -162,7 +162,6 @@ decode(PyObject *self, PyObject *args)
     int buffer_size, channels, sample_rate, size, len, output_size;
     uint8_t *buffer, *buffer_ptr, *data;
     PyThreadState *_save;
-    int err;
 
 #ifdef _WIN32
     Py_ssize_t w_length;
@@ -221,14 +220,8 @@ decode(PyObject *self, PyObject *args)
         return NULL;
 
     Py_UNBLOCK_THREADS
-    err = av_open_input_file(&format_context, PyString_AS_STRING(filename), NULL, 0, NULL);
-    if (err != 0) {
+    if (av_open_input_file(&format_context, PyString_AS_STRING(filename), NULL, 0, NULL) != 0) {
         Py_BLOCK_THREADS
-
-/* FIXME remove */
-
-            fprintf(stderr, "Error: |%s| %d\n", PyString_AS_STRING(filename), err);
-
         PyErr_SetString(PyExc_Exception, "Couldn't open the file.");
         return NULL;
     }
@@ -332,6 +325,5 @@ static PyMethodDef avcodec_methods[] = {
 PyMODINIT_FUNC
 initavcodec(void)
 {
-    avcodec_init();
     (void)Py_InitModule("avcodec", avcodec_methods);
 }
