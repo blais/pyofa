@@ -101,6 +101,8 @@ def lookup_fingerprint(fingerprint, musicdns_key):
     """Given the fingerprint of an audio file, lookup the PUID from the MusicDNS
     service, synchronously."""
     
+
+
 ## FIXME: todo
 ##     if file.state != file.PENDING:
 ##         handler(file, None)
