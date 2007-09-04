@@ -20,6 +20,7 @@ Dependencies
 
 - `Python 2.5 <http://python.org>`_ or higher
 - MusicIP's `libofa <http://www.musicip.com/dns>`_
+- python-mutagen
 
 
 Documentation

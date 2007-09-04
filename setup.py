@@ -135,12 +135,11 @@ class picard_config(config):
         cfg.set('build', 'with-' + name, False)
 
 
+
 def read_version():
-    try:
-        return open('VERSION', 'r').readline().strip()
-    except IOError, e:
-        raise SystemExit(
-            "Error: you must run setup from the root directory (%s)" % str(e))
+    sys.path.insert(0, 'lib/python')
+    from musicdns import __version__
+    return __version__
 
 
 args = {

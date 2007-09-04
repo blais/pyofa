@@ -3,18 +3,44 @@
 Compute the PUIDs for the given files.
 """
 
-import musicdns
+import os, musicdns, shelve
+from os.path import join, abspath
+
 
 def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
+
+    parser.add_option('-k', '--musicdns-key', action='store_true',
+                      help="Music DNS key")
+
     opts, args = parser.parse_args()
 
+    if not opts.musicdns_key:
+        keyfn = join(os.environ['HOME'], '.musicdns')
+        opts.musicdns_key = open(keyfn).read().strip()
+        
     musicdns.initialize()
 
+    # Open a cache for the fingerprints.
+    cachefn = join(os.environ['HOME'], '.musicdns_fingerprint_cache')
+    dbm = shelve.open(cachefn, 'c')
+
     for fn in args:
-        puid = musicdns.create_fingerprint(fn)
-        print fn, ':', puid
+        fn = abspath(fn)
+
+        # Get the fingerprint and duration..
+        try:
+            fp, duration = dbm[fn]
+        except KeyError:
+            fp, duration = musicdns.create_fingerprint(fn)
+            dbm[fn] = fp, duration
+            dbm.sync()
+
+        # Lookup puid from the fingerprint.
+        puid = musicdns.lookup_fingerprint(fp, duration, opts.musicdns_key)
+        print '%s (%s secs): %s' % (fn, duration, puid)
+        
 
     musicdns.finalize()
 

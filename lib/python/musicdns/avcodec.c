@@ -162,6 +162,7 @@ decode(PyObject *self, PyObject *args)
     int buffer_size, channels, sample_rate, size, len, output_size;
     uint8_t *buffer, *buffer_ptr, *data;
     PyThreadState *_save;
+    int duration;
 
 #ifdef _WIN32
     Py_ssize_t w_length;
@@ -173,40 +174,40 @@ decode(PyObject *self, PyObject *args)
 
     /* get the original filename as wchar_t* */
     w_length = PyUnicode_GetSize(filename) + 1;
-		w_filename = malloc(w_length * sizeof(wchar_t));
-		if (!w_filename)
+    w_filename = malloc(w_length * sizeof(wchar_t));
+    if (!w_filename)
         return NULL;
-		memset(w_filename, 0, w_length * sizeof(wchar_t));
-		PyUnicode_AsWideChar((PyUnicodeObject *)filename, w_filename, w_length - 1);
-
+    memset(w_filename, 0, w_length * sizeof(wchar_t));
+    PyUnicode_AsWideChar((PyUnicodeObject *)filename, w_filename, w_length - 1);
+    
     /* 'encode' the filename, so we can pass it as char* */
-		e_filename = malloc(w_length * sizeof(wchar_t) * 2 + w_length + 7);
-		if (!e_filename)
+    e_filename = malloc(w_length * sizeof(wchar_t) * 2 + w_length + 7);
+    if (!e_filename)
         return NULL;
-		strcpy(e_filename, "ufile:");
-		w_ptr = w_filename;
-		e_ptr = e_filename + 6;
-		while (*w_ptr) {
-		    *e_ptr++ = 0x20 + ((*w_ptr >>  0) & 0x0F);
-		    *e_ptr++ = 0x20 + ((*w_ptr >>  4) & 0x0F);
-		    *e_ptr++ = 0x20 + ((*w_ptr >>  8) & 0x0F);
-		    *e_ptr++ = 0x20 + ((*w_ptr >> 12) & 0x0F);
-		    w_ptr++;
-		}
-		*e_ptr++ = 0x20;
-		*e_ptr++ = 0x20;
-		*e_ptr++ = 0x20;
-		*e_ptr++ = 0x20;
-		/* copy ASCII filename to the end for extension-based format detection */		
-		w_ptr = w_filename;
-		while (*w_ptr) {
-		    *e_ptr++ = (*w_ptr++) & 0xFF;
-		}
-		*e_ptr = 0;
+    strcpy(e_filename, "ufile:");
+    w_ptr = w_filename;
+    e_ptr = e_filename + 6;
+    while (*w_ptr) {
+        *e_ptr++ = 0x20 + ((*w_ptr >>  0) & 0x0F);
+        *e_ptr++ = 0x20 + ((*w_ptr >>  4) & 0x0F);
+        *e_ptr++ = 0x20 + ((*w_ptr >>  8) & 0x0F);
+        *e_ptr++ = 0x20 + ((*w_ptr >> 12) & 0x0F);
+        w_ptr++;
+    }
+    *e_ptr++ = 0x20;
+    *e_ptr++ = 0x20;
+    *e_ptr++ = 0x20;
+    *e_ptr++ = 0x20;
+    /* copy ASCII filename to the end for extension-based format detection */		
+    w_ptr = w_filename;
+    while (*w_ptr) {
+        *e_ptr++ = (*w_ptr++) & 0xFF;
+    }
+    *e_ptr = 0;
 		
-    Py_UNBLOCK_THREADS
+    Py_UNBLOCK_THREADS;
     if (av_open_input_file(&format_context, e_filename, NULL, 0, NULL) != 0) {
-        Py_BLOCK_THREADS
+        Py_BLOCK_THREADS;
         free(e_filename);
         free(w_filename);
         PyErr_SetString(PyExc_Exception, "Couldn't open the file.");
@@ -219,16 +220,16 @@ decode(PyObject *self, PyObject *args)
     if (!PyArg_ParseTuple(args, "S", &filename))
         return NULL;
 
-    Py_UNBLOCK_THREADS
+    Py_UNBLOCK_THREADS;
     if (av_open_input_file(&format_context, PyString_AS_STRING(filename), NULL, 0, NULL) != 0) {
-        Py_BLOCK_THREADS
+        Py_BLOCK_THREADS;
         PyErr_SetString(PyExc_Exception, "Couldn't open the file.");
         return NULL;
     }
 #endif
 
     if (av_find_stream_info(format_context) < 0) {
-        Py_BLOCK_THREADS
+        Py_BLOCK_THREADS;
         PyErr_SetString(PyExc_Exception, "Couldn't find stream information in the file.");
         return NULL;
     }
@@ -244,20 +245,20 @@ decode(PyObject *self, PyObject *args)
             break;
     }
     if (codec_context == NULL) {
-        Py_BLOCK_THREADS
+        Py_BLOCK_THREADS;
         PyErr_SetString(PyExc_Exception, "Couldn't find any audio stream in the file.");
         return NULL;
     }
 
     codec = avcodec_find_decoder(codec_context->codec_id);
     if (codec == NULL) {
-        Py_BLOCK_THREADS
+        Py_BLOCK_THREADS;
         PyErr_SetString(PyExc_Exception, "Unknown codec.");
         return NULL;
     }
 
     if (avcodec_open(codec_context, codec) < 0) {
-        Py_BLOCK_THREADS
+        Py_BLOCK_THREADS;
         PyErr_SetString(PyExc_Exception, "Couldn't open the codec.");
         return NULL;
     }
@@ -305,14 +306,25 @@ decode(PyObject *self, PyObject *args)
     if (format_context)
         av_close_input_file(format_context);
 
-    Py_BLOCK_THREADS
+    Py_BLOCK_THREADS;
+
+    /* Compute the duration of the entire file (in millis) */
+    /* FIXME: If we can fix getting the duration from ffmpeg, we can get rid
+       of the mutagen dependency. */
+    if (format_context->duration != AV_NOPTS_VALUE) {
+        duration = format_context->duration / AV_TIME_BASE * 1000;
+    } else {
+        duration = 0;
+    }
+    /* printf("Duration: %f\n", duration); */
+    /* FIXME: this is incorrect. */
 
     return Py_BuildValue("(N,i,i,i,i)",
         PyCObject_FromVoidPtr(buffer, free),
         (buffer_ptr - buffer) / 2,
         sample_rate,
         channels == 2 ? 1 : 0,
-        0);
+        duration);
 }
 
 static PyMethodDef avcodec_methods[] = {
