@@ -18,7 +18,7 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
-import sys, os.path, logging, urllib
+import sys, os.path, logging, urllib, re
 from xml.etree import ElementTree
 from xml.etree.ElementTree import iterparse
 from xml.etree.ElementPath import Path
@@ -97,7 +97,7 @@ def create_fingerprint(filename):
     duration = File(filename).info.length * 1000
 
     fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
-    return fingerprint, duration
+    return fingerprint, int(duration)
 
 def encode_filename(filename):
     """Encode unicode strings to filesystem encoding."""
@@ -151,17 +151,23 @@ def lookup_fingerprint(fingerprint, duration, musicdns_key, **opt):
     data = urllib.urlencode(postargs)
     f = urllib.urlopen(url, data)
 
-## from BeautifulSoup import BeautifulStoneSoup
-##     soup = BeautifulStoneSoup(f)
-##     print soup.findAll('puid')
+    # Parse the response.
+    tree = ElementTree.parse(f)
+    sanitize_tree(tree)
+    el = tree.find('//puid')
+    puid = el.attrib['id'] if el is not None else None
 
-##     text = f.read()
-##     tree = ElementTree.parse(text)
-##     print text
-    for event, elem in iterparse(f):
-        print elem.tag
-##         print event, elem
+    return puid
 
-    print tree.write(sys.stdout)
-    print tree.findall('{http://musicbrainz.org/ns/mmd-1.0}metadata')
     
+def sanitize_tree(tree):
+    """Remove all XML namespaces from the element tree. This is an inconvenience
+    due to the effbot's obsessiveness in maintaining the XML namespaces
+    throughout the tags. We prefer BeautifulSoup, which does away with this
+    nonsense, but since etree comes with Python, we'll settle for this kludge
+    instead in the name of avoiding dependencies.
+    """
+    for el in tree.getiterator():
+        el.tag = re.sub('{.*}', '', el.tag)
+
+

@@ -3,8 +3,10 @@
 Compute the PUIDs for the given files.
 """
 
-import os, musicdns, shelve
-from os.path import join, abspath
+import os
+from os.path import join
+
+import musicdns, musicdns.cache
 
 
 def main():
@@ -22,28 +24,14 @@ def main():
         
     musicdns.initialize()
 
-    # Open a cache for the fingerprints.
-    cachefn = join(os.environ['HOME'], '.musicdns_fingerprint_cache')
-    dbm = shelve.open(cachefn, 'c')
-
+    cache = musicdns.cache.MusicDNSCache()
     for fn in args:
-        fn = abspath(fn)
-
-        # Get the fingerprint and duration..
-        try:
-            fp, duration = dbm[fn]
-        except KeyError:
-            fp, duration = musicdns.create_fingerprint(fn)
-            dbm[fn] = fp, duration
-            dbm.sync()
-
-        # Lookup puid from the fingerprint.
-        puid = musicdns.lookup_fingerprint(fp, duration, opts.musicdns_key)
-        print '%s (%s secs): %s' % (fn, duration, puid)
+        puid, duration = cache.getpuid(fn, opts.musicdns_key)
+        print '%s (%s millisecs): %s' % (fn, duration, puid)
         
-
     musicdns.finalize()
 
 if __name__ == '__main__':
     main()
+
 
