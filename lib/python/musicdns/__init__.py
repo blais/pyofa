@@ -25,7 +25,7 @@ from xml.etree.ElementPath import Path
 from mutagen import File
 
 
-__version__ = '1.0b1' # 2007-09-06
+__version__ = '1.0b2' # 2007-09-06
 
 __all__ = ('initialize', 'finalize',
            'create_fingerprint', 'lookup_fingerprint')

@@ -11,8 +11,9 @@
       2.1  MusicDNS Key
     3  Documentation
     4  Download
-    5  Copyright and License
-    6  Author
+    5  Build and Installation
+    6  Copyright and License
+    7  Author
 
 Description
 ===========
@@ -46,11 +47,18 @@ Documentation
 - `TODO <TODO>`_
 
 
-
 Download
 ========
 
 - `Download </downloads/pyofa/>`_
+
+
+Build and Installation
+======================
+::
+
+  python setup.py config
+  python setup.py install 
 
 
 Copyright and License

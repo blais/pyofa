@@ -11,7 +11,7 @@ tags.
 __author__ = 'Martin Blais <blais@furius.ca>'
 
 # stdlib imports
-import sys, os, re, logging
+import sys, os, re, logging, StringIO
 from os.path import *
 from collections import defaultdict
 from operator import itemgetter
@@ -41,11 +41,15 @@ def process_dir(dn, musicdns_key):
         nfiles.append((track, fn, puid))
     nfiles.sort()
 
+    # Output text.
+    o = StringIO.StringIO()
+    write = lambda x: o.write(x + u'\n')
+
     # For each track, filter the releases by including only those whose track
     # number matches the filename track number.
     matchrel = defaultdict(int)
     for i, (no, fn, puid) in enumerate(nfiles):
-        write('')
+        write(u'')
         write(fn)
         if puid is None:
             continue
@@ -68,7 +72,8 @@ def process_dir(dn, musicdns_key):
         urlRelations=True,
         labels=True,
         )
-    for rid, freq in sorted(matchrel.iteritems(), key=itemgetter(1), reverse=1):
+    releases = sorted(matchrel.iteritems(), key=itemgetter(1), reverse=1)
+    for rid, freq in releases:
         rel = q.getReleaseById(rid, i)
 
         write(u'  (Frequency): %d' % freq)
@@ -82,6 +87,19 @@ def process_dir(dn, musicdns_key):
         # Skip the releases whose number of tracks do not match.
         if len(rel.getTracks()) != len(nfiles):
             logging.warning("Unmatched number of tracks.")
+
+    # Select the most appropriate one.
+    if releases:
+        mfreq = max(freq for rel, freq in releases)
+        mreleases = [rel for rel, freq in releases if freq == mfreq]
+
+        ntmatches = [rel for rel in mreleases if len(rel.getTracks()) == len(nfiles)]
+        chosen = ntmatches[0] if ntmatches else mreleases[0]
+    else:
+        chosen = None
+
+    return chosen, o.getvalue()
+
 
 def filename_track_number(fn):
     """Given filename, attempt to find the track numbers from the filenames."""
@@ -106,9 +124,6 @@ def find_releases(puid):
         out.append((rel.getTracksOffset()+1, track, rel))
     return out
 
-def write(s):
-    print s.encode('latin1', 'replace')
-
 def main():
     import optparse
     parser = optparse.OptionParser(__doc__.strip())
@@ -119,7 +134,7 @@ def main():
     opts, args = parser.parse_args()
 
     if not opts.musicdns_key:
-        keyfn = join(os.environ['HOME'], '.musicdns')
+        keyfn = join(os.environ['HOME'], '.musicdns_key')
         opts.musicdns_key = open(keyfn).read().strip()
 
     musicdns.initialize()
@@ -127,7 +142,12 @@ def main():
     global cache; cache = musicdns.cache.MusicDNSCache()
 
     for dn in args:
-        process_dir(dn, opts.musicdns_key)
+        release, text = process_dir(dn, opts.musicdns_key)
+        f = open(join(dn, 'saved.mb.release-id'), 'w')
+        f.write(str(release))
+        f.write('\n')
+        f.write(text.encode('utf8', 'replace'))
+        f.close()
 
     musicdns.finalize()
 

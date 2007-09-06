@@ -23,7 +23,7 @@ def main():
     opts, args = parser.parse_args()
 
     if not opts.musicdns_key:
-        keyfn = join(os.environ['HOME'], '.musicdns')
+        keyfn = join(os.environ['HOME'], '.musicdns_key')
         opts.musicdns_key = open(keyfn).read().strip()
         
     musicdns.initialize()
