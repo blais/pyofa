@@ -26,6 +26,10 @@ from mutagen import File
 from musicbrainz2.webservice import Query, TrackFilter, WebServiceError, ReleaseIncludes
 
 
+output_filename = 'saved.mb.release-id'
+
+valid_extensions = ('.mp3', '.m4a', '.m4p', '.off', '.wav')
+
 def process_dir(dn, musicdns_key):
     dn = abspath(dn)
     files = [join(dn, x) for x in os.listdir(dn)]
@@ -33,6 +37,8 @@ def process_dir(dn, musicdns_key):
     # Create a list of (track, filename, puid).
     nfiles = []
     for fn in files:
+        if splitext(fn)[1] not in valid_extensions:
+            continue
         try:
             puid, _ = cache.getpuid(fn, musicdns_key)
         except IOError:
@@ -43,7 +49,11 @@ def process_dir(dn, musicdns_key):
 
     # Output text.
     o = StringIO.StringIO()
-    write = lambda x: o.write(x + u'\n')
+    def write(s):
+        ss = s + u'\n'
+        o.write(ss)
+        sys.stdout.write(ss.encode('latin1', 'replace'))
+        sys.stdout.flush()
 
     # For each track, filter the releases by including only those whose track
     # number matches the filename track number.
@@ -72,10 +82,9 @@ def process_dir(dn, musicdns_key):
         urlRelations=True,
         labels=True,
         )
-    releases = sorted(matchrel.iteritems(), key=itemgetter(1), reverse=1)
-    for rid, freq in releases:
-        rel = q.getReleaseById(rid, i)
-
+    releaseids = sorted(matchrel.iteritems(), key=itemgetter(1), reverse=1)
+    releases = [(q.getReleaseById(rid, i), freq) for rid, freq in releaseids]
+    for rel, freq in releases:
         write(u'  (Frequency): %d' % freq)
         write(u'  Title: %s' % rel.title)
         write(u'  Artist: %s' % rel.artist.name)
@@ -90,8 +99,8 @@ def process_dir(dn, musicdns_key):
 
     # Select the most appropriate one.
     if releases:
-        mfreq = max(freq for rel, freq in releases)
-        mreleases = [rel for rel, freq in releases if freq == mfreq]
+        maxfreq = max(freq for rel, freq in releases)
+        mreleases = [rel for rel, freq in releases if freq == maxfreq]
 
         ntmatches = [rel for rel in mreleases if len(rel.getTracks()) == len(nfiles)]
         chosen = ntmatches[0] if ntmatches else mreleases[0]
@@ -142,9 +151,14 @@ def main():
     global cache; cache = musicdns.cache.MusicDNSCache()
 
     for dn in args:
+        dn = abspath(dn)
+        if not isdir(dn):
+            continue
+        print '... Processing %s ...' % dn
         release, text = process_dir(dn, opts.musicdns_key)
-        f = open(join(dn, 'saved.mb.release-id'), 'w')
-        f.write(str(release))
+        f = open(join(dn, output_filename), 'w')
+        f.write(basename(release.id) + '\n\n')
+        f.write(release.id + '.html\n')
         f.write('\n')
         f.write(text.encode('utf8', 'replace'))
         f.close()
