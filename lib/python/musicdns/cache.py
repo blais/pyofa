@@ -23,6 +23,7 @@ class MusicDNSCache(object):
         try:
             duration, fingerprint, puid = self.dbm[fn]
         except KeyError:
+            duration = None
             fingerprint = None
             puid = None
 
@@ -30,7 +31,7 @@ class MusicDNSCache(object):
 
             # Get the fingerprint and duration.
             try:
-                fingerprint, duration = self.dbm[fn]
+                duration, fingerprint, puid = self.dbm[fn]
             except KeyError:
                 fingerprint, duration = musicdns.create_fingerprint(fn)
                 self.dbm[fn] = duration, fingerprint, puid

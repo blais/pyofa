@@ -3,9 +3,13 @@
 Compute the PUIDs for the given files.
 """
 
-import os
+__author__ = 'Martin Blais <blais@furius.ca>'
+
+# stdlib imports
+import sys, os
 from os.path import join
 
+# musicdns imports
 import musicdns, musicdns.cache
 
 
@@ -26,8 +30,13 @@ def main():
 
     cache = musicdns.cache.MusicDNSCache()
     for fn in args:
-        puid, duration = cache.getpuid(fn, opts.musicdns_key)
-        print '%s (%s millisecs): %s' % (fn, duration, puid)
+        sys.stdout.write(fn + ': ')
+        sys.stdout.flush()
+        try:
+            puid, duration = cache.getpuid(fn, opts.musicdns_key)
+            print '(%s millisecs): %s' % (duration, puid)
+        except IOError:
+            print >> sys.stderr, "Error decoding: %s" % fn
         
     musicdns.finalize()
 

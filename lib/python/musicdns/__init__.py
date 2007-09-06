@@ -82,7 +82,7 @@ def create_fingerprint(filename):
         logging.debug("Decoding using %r...", decoder.__name__)
         try:
             result = decoder.decode(filename)
-        except Exception:
+        except Exception, e:
             continue
     if not result:
         raise IOError("Could not decode file '%s' with any of the available decoders: %s." %
@@ -130,13 +130,13 @@ def lookup_fingerprint(fingerprint, duration, musicdns_key, **opt):
 
         # These are required by the license agreement, to help fill out the
         # MusicDNS database.
-        art='unknown',
+        art=opt.pop('art', ''),
         ttl='02-Track_02',
-        alb='unknown',
-        tnm='unknown',  # track no.
-        gnr='unknown',
-        yrr='unknown',
-        brt='unknown',
+        alb=opt.pop('alb', ''),
+        tnm=opt.pop('tnm', ''),  # track no.
+        gnr=opt.pop('gnr', ''),
+        yrr=opt.pop('yrr', ''),
+        brt=opt.pop('brt', ''),
         fmt='', ##MPEG-1 Layer 3',
         dur=str(duration),
 
