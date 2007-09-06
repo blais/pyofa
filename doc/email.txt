@@ -1,0 +1,47 @@
+Hi
+
+After trying out Picard and having found the desire to experiment a
+little more with writing scripts to automatically deduce the CDs out
+of my lame-encoded audio files without tags, I ended up ripping out
+the picard.musicdns Python codes of Lukas and repackaging it
+independently, so that it does not depend on Qt. You can find the
+package here:
+
+  http://furius.ca/pyofa/
+
+It's basically Lukas' Picard code sans the Qt dependencies, and
+without the asynchronous code (no threads). This allows you to easily
+get PUIDs from your audio files from a simple Python script. See
+pyofa/bin/musicdns-getpuid for an example. (Lukas mentioned that he
+would keep picard.musicdns rather than depend on pyofa - he prefers to
+keep control in one place - so I will sync pyofa to his changes
+occasionally).
+
+Usage goes something like this:
+
+    musicdns.initialize() ... puid, duration = cache.getpuid(filename,
+    opts.musicdns_key) ... musicdns.finalize()
+
+Motivation: I have directories of MP3 files corresponding to CDs that
+I bought, with all of, and only the files of a single album at a time.
+I can deduce the track numbers from the filenames (e.g.,
+01-Track01.mp3) and compute the PUIDs using MusicDNS. Given the pairs
+of (trackno, puid) for all or most of the tracks, I can then easily
+filter out the matching MusicBrainz releases whose track numbers do
+not match the track numbers of the files. I can also rank the releases
+by the number of tracks that reference them. Finally, I can use the
+number of audio files vs. nb. of tracks in the release to further
+score the releases. Using this heuristic, I'm getting very good match
+accuracy on my albums that is entirely and completely automated (i.e.,
+no dragging and dropping). The script is in the bin directory.
+
+BTW I'm sure the same simplistic heuristic described above could be
+integrated in Picard to improve its automatic matching when scanning
+the files.
+
+Note: There is still a dependency on python-mutagen, which only
+remains because I have not found a reliable way to estimate audio file
+duration (the values computed by ffmpeg seem awfully wrong, and an
+incorrect duration throws off MusicDNS' fingerprint-to-puid lookup).
+
+Thanks all (and thanks Lukas!) cheers,
