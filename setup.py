@@ -53,7 +53,7 @@ if cfg.getboolean('build', 'with-avcodec'):
                   extra_link_args=cfg.get('avcodec', 'libs').split()))
 
 
-class picard_config(config):
+class pyofa_config(config):
 
     def run(self):
         print 'checking for pkg-cfg...',
@@ -145,13 +145,13 @@ def read_version():
 args = {
     'name': 'pyofa',
     'version': read_version(),
-    'description': 'A Python wrapper for the MusicDNS libofa',
+    'description': 'A Python wrapper for MusicDNS.',
     'url': 'http://furius.ca/pyofa',
     'package_dir': {'': 'lib/python'},
     'packages': ('musicdns',),
     'ext_modules': ext_modules,
     'cmdclass': {
-        'config': picard_config,
+        'config': pyofa_config,
     },
 }
 

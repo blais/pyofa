@@ -1,0 +1,11 @@
+Description: A Python wrapper for MusicDNS.
+Official-Homepage: http://furius.ca/pyofa
+Mirror-Homepage: http://pyofa.sourceforge.net
+Author: Martin Blais
+Author-Email: blais@furius.ca
+ChangeLog: http://furius.ca/pyofa/CHANGES
+Announcement: http://freshmeat.net/projects/pyofa/
+Announcement: http://www.python.org/pypi?%3Aaction=search&name=pyofa
+Download-Releases: http://furius.ca/downloads/pyofa/releases
+Download-Snapshots: http://furius.ca/downloads/pyofa/snapshots
+License: GNU GPL
