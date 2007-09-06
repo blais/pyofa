@@ -32,8 +32,8 @@ Dependencies
 MusicDNS Key
 ------------
 
-You will need your own MusicDNS key.
-You can get one here:
+You will need your own MusicDNS key to use this package. You simply
+provide it to the `getpuid()` function. You register for a key here:
 
   http://www.musicip.com/dns/key.jsp
 
