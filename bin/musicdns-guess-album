@@ -157,8 +157,11 @@ def main():
         print '... Processing %s ...' % dn
         release, text = process_dir(dn, opts.musicdns_key)
         f = open(join(dn, output_filename), 'w')
-        f.write(basename(release.id) + '\n\n')
-        f.write(release.id + '.html\n')
+        if release is not None:
+            f.write(basename(release.id) + '\n\n')
+            f.write(release.id + '.html\n')
+        else:
+            f.write('\n\n\n')
         f.write('\n')
         f.write(text.encode('utf8', 'replace'))
         f.close()
