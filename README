@@ -8,6 +8,7 @@
 ..
     1  Description
     2  Dependencies
+      2.1  MusicDNS Key
     3  Documentation
     4  Download
     5  Copyright and License
@@ -27,6 +28,14 @@ Dependencies
 - `Python 2.5 <http://python.org>`_ or higher
 - MusicIP's `libofa <http://www.musicip.com/dns>`_
 - python-mutagen
+
+MusicDNS Key
+------------
+
+You will need your own MusicDNS key.
+You can get one here:
+
+  http://www.musicip.com/dns/key.jsp
 
 
 Documentation
