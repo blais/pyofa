@@ -19,9 +19,16 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 
 import sys, os.path, logging, urllib, re
-from xml.etree import ElementTree
-from xml.etree.ElementTree import iterparse
-from xml.etree.ElementPath import Path
+
+try:
+    from xml.etree import ElementTree
+    from xml.etree.ElementTree import iterparse
+    from xml.etree.ElementPath import Path
+except ImportError:
+    from elementtree import ElementTree
+    from elementtree.ElementTree import iterparse
+    from elementtree.ElementPath import Path
+
 from mutagen import File
 
 
@@ -155,7 +162,11 @@ def lookup_fingerprint(fingerprint, duration, musicdns_key, **opt):
     tree = ElementTree.parse(f)
     sanitize_tree(tree)
     el = tree.find('//puid')
-    puid = el.attrib['id'] if el is not None else None
+
+    if el is not None:
+        puid = el.attrib['id']
+    else:
+        puid = None
 
     return puid
 

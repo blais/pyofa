@@ -1,0 +1,10 @@
+Lukáš Lalinský <lalinsky at gmail.com>: 
+  Author of Picard and original C code from which pyofa was created.
+
+Martin Blais <blais at furius.ca>:
+  Extracted code from Picard and originator of pyofa.
+
+Jeremy Ehrhardt <arachnoid at gmail.com>: 
+  Backported to Python 2.4.
+
+
