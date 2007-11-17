@@ -55,10 +55,18 @@ Download
 
 Build and Installation
 ======================
-::
+
+To add to your Python installation::
 
   python setup.py config
   python setup.py install 
+
+To build the dynlibs in-place (for development, typically)::
+
+  python setup.py config
+  python setup.py build_ext --inplace
+
+
 
 
 Copyright and License

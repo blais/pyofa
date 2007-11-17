@@ -154,6 +154,7 @@ args = {
     'ext_modules': ext_modules,
     'cmdclass': {
         'config': pyofa_config,
+    'scripts': ['bin/musicdns-getpuid', 'bin/musicdns-guess-album'],
     },
 }
 
