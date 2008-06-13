@@ -3,7 +3,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="generator" content="Docutils 0.4: http://docutils.sourceforge.net/" />
+<meta name="generator" content="Docutils 0.5: http://docutils.sourceforge.net/" />
 <title>pyofa: Python Wrapper for MusicDNS  (libofa)</title>
 <link rel="stylesheet" href="style.css" type="text/css" />
 </head>
@@ -18,20 +18,21 @@
 
 <div class="document" id="pyofa-python-wrapper-for-musicdns-libofa">
 <h1 class="title">pyofa: Python Wrapper for MusicDNS  (libofa)</h1>
+
 <!-- -*- coding: utf-8 -*- -->
-<div class="contents topic">
-<p class="topic-title first"><a id="contents" name="contents">Contents</a></p>
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
 <ul class="simple">
-<li><a class="reference" href="#description" id="id2" name="id2">Description</a></li>
-<li><a class="reference" href="#dependencies" id="id3" name="id3">Dependencies</a><ul>
-<li><a class="reference" href="#musicdns-key" id="id4" name="id4">MusicDNS Key</a></li>
+<li><a class="reference" href="#description" id="id2">Description</a></li>
+<li><a class="reference" href="#dependencies" id="id3">Dependencies</a><ul>
+<li><a class="reference" href="#musicdns-key" id="id4">MusicDNS Key</a></li>
 </ul>
 </li>
-<li><a class="reference" href="#documentation" id="id5" name="id5">Documentation</a></li>
-<li><a class="reference" href="#download" id="id6" name="id6">Download</a></li>
-<li><a class="reference" href="#build-and-installation" id="id7" name="id7">Build and Installation</a></li>
-<li><a class="reference" href="#copyright-and-license" id="id8" name="id8">Copyright and License</a></li>
-<li><a class="reference" href="#author" id="id9" name="id9">Author</a></li>
+<li><a class="reference" href="#documentation" id="id5">Documentation</a></li>
+<li><a class="reference" href="#download" id="id6">Download</a></li>
+<li><a class="reference" href="#build-and-installation" id="id7">Build and Installation</a></li>
+<li><a class="reference" href="#copyright-and-license" id="id8">Copyright and License</a></li>
+<li><a class="reference" href="#author" id="id9">Author</a></li>
 </ul>
 </div>
 <!-- 1  Description
@@ -42,54 +43,65 @@
 5  Build and Installation
 6  Copyright and License
 7  Author -->
-<div class="section">
-<h1><a class="toc-backref" href="#id2" id="description" name="description">Description</a></h1>
+<div class="section" id="description">
+<h1><a class="toc-backref" href="#id2">Description</a></h1>
 <p>pyofa is a simple Python wrapper around the MusicDNS technology
 provided by MusicIP for generating PUIDs (audio fingerprints) from
 audio files (e.g. MP3, M4A, etc.).</p>
 </div>
-<div class="section">
-<h1><a class="toc-backref" href="#id3" id="dependencies" name="dependencies">Dependencies</a></h1>
+<div class="section" id="dependencies">
+<h1><a class="toc-backref" href="#id3">Dependencies</a></h1>
 <ul class="simple">
 <li><a class="reference" href="http://python.org">Python 2.5</a> or higher</li>
 <li>MusicIP's <a class="reference" href="http://www.musicip.com/dns">libofa</a></li>
 <li>python-mutagen</li>
 </ul>
-<div class="section">
-<h2><a class="toc-backref" href="#id4" id="musicdns-key" name="musicdns-key">MusicDNS Key</a></h2>
+<div class="section" id="musicdns-key">
+<h2><a class="toc-backref" href="#id4">MusicDNS Key</a></h2>
 <p>You will need your own MusicDNS key to use this package. You simply
 provide it to the <cite>getpuid()</cite> function. You register for a key here:</p>
 <blockquote>
 <a class="reference" href="http://www.musicip.com/dns/key.jsp">http://www.musicip.com/dns/key.jsp</a></blockquote>
 </div>
 </div>
-<div class="section">
-<h1><a class="toc-backref" href="#id5" id="documentation" name="documentation">Documentation</a></h1>
+<div class="section" id="documentation">
+<h1><a class="toc-backref" href="#id5">Documentation</a></h1>
 <ul class="simple">
 <li>See <a class="reference" href="bin/musicdns-getpuid">example script</a></li>
 <li><a class="reference" href="CHANGES">CHANGES</a></li>
 <li><a class="reference" href="TODO">TODO</a></li>
 </ul>
 </div>
-<div class="section">
-<h1><a class="toc-backref" href="#id6" id="download" name="download">Download</a></h1>
+<div class="section" id="download">
+<h1><a class="toc-backref" href="#id6">Download</a></h1>
 <ul class="simple">
 <li><a class="reference" href="/downloads/pyofa/">Download</a></li>
 </ul>
+<p>For the absolute latest version, get it from the Mercurial
+repository:</p>
+<pre class="literal-block">
+hg clone https://hg.furius.ca/public/pyofa
+</pre>
 </div>
-<div class="section">
-<h1><a class="toc-backref" href="#id7" id="build-and-installation" name="build-and-installation">Build and Installation</a></h1>
+<div class="section" id="build-and-installation">
+<h1><a class="toc-backref" href="#id7">Build and Installation</a></h1>
+<p>To add to your Python installation:</p>
 <pre class="literal-block">
 python setup.py config
 python setup.py install
 </pre>
+<p>To build the dynlibs in-place (for development, typically):</p>
+<pre class="literal-block">
+python setup.py config
+python setup.py build_ext --inplace
+</pre>
 </div>
-<div class="section">
-<h1><a class="toc-backref" href="#id8" id="copyright-and-license" name="copyright-and-license">Copyright and License</a></h1>
+<div class="section" id="copyright-and-license">
+<h1><a class="toc-backref" href="#id8">Copyright and License</a></h1>
 <p>This code is distributed under the <a class="reference" href="COPYING">GNU General Public License</a>;</p>
 </div>
-<div class="section">
-<h1><a class="toc-backref" href="#id9" id="author" name="author">Author</a></h1>
+<div class="section" id="author">
+<h1><a class="toc-backref" href="#id9">Author</a></h1>
 <p>Martin Blais &lt;<a class="reference" href="mailto:blais&#64;furius.ca">blais&#64;furius.ca</a>&gt;
 (using the code of Lukáš Lalinský)</p>
 <div class="note">

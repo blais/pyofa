@@ -52,6 +52,12 @@ Download
 
 - `Download </downloads/pyofa/>`_
 
+For the absolute latest version, get it from the Mercurial
+repository::
+
+  hg clone https://hg.furius.ca/public/pyofa
+
+
 
 Build and Installation
 ======================

@@ -1,0 +1,4 @@
+build.cfg
+build
+lib/python/musicdns/avcodec.so
+lib/python/musicdns/ofa.so
