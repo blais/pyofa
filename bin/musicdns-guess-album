@@ -56,9 +56,9 @@ def process_dir(dn, musicdns_key):
     # Output text.
     o = StringIO.StringIO()
     def write(s):
-        ss = s + u'\n'
+        ss = s + '\n'
         o.write(ss)
-        sys.stdout.write(ss.encode('latin1', 'replace'))
+        sys.stdout.write(ss)
         sys.stdout.flush()
 
     # For each track, filter the releases by including only those whose track
