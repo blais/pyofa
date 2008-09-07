@@ -12,6 +12,7 @@
     3  Documentation
     4  Download
     5  Build and Installation
+      5.1  Installing on Ubuntu
     6  Copyright and License
     7  Author
 
@@ -62,17 +63,22 @@ repository::
 Build and Installation
 ======================
 
-To add to your Python installation::
+To build the dynlibs::
 
   python setup.py config
+
+In order for this to work, it should say "yes" for both ofa and
+avcodec. Then, to build and install::
+
+  python setup.py build_ext --inplace
   python setup.py install 
 
-To build the dynlibs in-place (for development, typically)::
 
-  python setup.py config
-  python setup.py build_ext --inplace
+Installing on Ubuntu
+--------------------
+Ubuntu, here are the list of packages you need to install::
 
-
+  # apt-get install python-mutagen libavcodec-dev libavformat-dev libofa0-dev
 
 
 Copyright and License

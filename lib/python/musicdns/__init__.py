@@ -51,7 +51,7 @@ def import_decoders():
             # lengthy, and we want to give the change to multithreaded programs
             # to delegate this to a background thread in order to speed up
             # startup.
-        except ImportError:
+        except ImportError, e:
             pass
     if not _decoders:
         logging.warning(
@@ -69,11 +69,15 @@ def finalize():
 
 try:
     import ofa
-    import_decoders()
 except ImportError:
-    logging.warning("Libofa not found! Fingerprinting will be disabled.")
+    logging.warning("ofa python module not found! Fingerprinting will be disabled.")
     ofa = None
 
+try:
+    import_decoders()
+except ImportError:
+    logging.warning("Decoder modules not found! Fingerprinting will be disabled.")
+    ofa = None
 
 def create_fingerprint(filename):
     """Compute a fingerprint from an open audio file.
