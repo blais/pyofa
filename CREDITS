@@ -7,4 +7,7 @@ Martin Blais <blais at furius.ca>:
 Jeremy Ehrhardt <arachnoid at gmail.com>: 
   Backported to Python 2.4.
 
+Manuel Amador (Rudd-O) <rudd-o@rudd-o.com>:
+  Made RPM build possible.
+  Fixed bug with WAV files.
 

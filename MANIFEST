@@ -1,0 +1,7 @@
+README
+setup.py
+lib/python/musicdns/__init__.py
+lib/python/musicdns/cache.py
+setup.cfg
+lib/python/musicdns/ofa.c
+lib/python/musicdns/avcodec.c

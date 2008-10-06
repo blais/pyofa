@@ -30,6 +30,7 @@ Dependencies
 - `Python 2.5 <http://python.org>`_ or higher
 - MusicIP's `libofa <http://www.musicip.com/dns>`_
 - python-mutagen
+- libavcodec (FFMPEG)
 
 MusicDNS Key
 ------------
@@ -72,6 +73,10 @@ avcodec. Then, to build and install::
 
   python setup.py build_ext --inplace
   python setup.py install 
+
+or to build an RPM (with AVCodec/FFMPEG and OFA enabled)::
+
+  python setup.py bdist_rpm
 
 
 Installing on Ubuntu

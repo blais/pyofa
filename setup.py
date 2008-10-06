@@ -15,12 +15,21 @@ from distutils.core import setup, Extension
 defaults = {
     'build': {
         'with-directshow': 'False',
-        'with-avcodec': 'False',
-        'with-libofa': 'False',
+        'with-avcodec': 'True',
+        'with-libofa': 'True',
     },
-    'avcodec': {'cflags': '', 'libs': ''},
+    'avcodec': {
+        'cflags': '-I/usr/include/ffmpeg',
+        'libs': ('-pthread -lavformat -lavcodec -lz -la52 '
+                 '-lfaac -lfaad -lgsm -lmp3lame -lx264 -lxvidcore '
+                 '-ldc1394 -ldl -lX11 -lXext -lraw1394 -ltheora '
+                 '-lvorbisenc -lavutil -lvorbis -lm -logg')
+        },
     'directshow': {'cflags': '', 'libs': ''},
-    'libofa': {'cflags': '', 'libs': ''},
+    'libofa': {
+        'cflags': '',
+        'libs': '-lofa'
+        },
 }
 cfg = RawConfigParser()
 for section, values in defaults.items():

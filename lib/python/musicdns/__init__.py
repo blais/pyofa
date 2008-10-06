@@ -32,7 +32,7 @@ except ImportError:
 from mutagen import File
 
 
-__version__ = '1.0' # 2007-09-12
+__version__ = '1.0.3' # 2008-10-06
 
 __all__ = ('initialize', 'finalize',
            'create_fingerprint', 'lookup_fingerprint')
@@ -105,7 +105,14 @@ def create_fingerprint(filename):
     # get the duration. If we could fix this in ffmpeg, we would not need the
     # dependency on mutagen.
     buffer, samples, sample_rate, stereo, _duration = result
-    duration = File(filename).info.length * 1000
+    mutagenfile = File(filename)
+    if not mutagenfile:
+	# This is what should happen, actually:
+        #  raise Warning, "Mutagen does not support file %r,
+        #                   cannot determine duration"%filename
+	duration = -1
+    else:
+	duration = mutagenfile.info.length * 1000
 
     fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
     return fingerprint, int(duration)
