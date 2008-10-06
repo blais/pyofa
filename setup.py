@@ -13,11 +13,15 @@ from distutils.command.install import install as install
 from distutils.core import setup, Extension
 
 defaults = {
+
     'build': {
         'with-directshow': 'False',
         'with-avcodec': 'True',
         'with-libofa': 'True',
     },
+
+    # Note: you may have to customize some of the flags below for your
+    # specific installation and support requirements.
     'avcodec': {
         'cflags': '-I/usr/include/ffmpeg',
         'libs': ('-pthread -lavformat -lavcodec -lz -la52 '
@@ -25,12 +29,19 @@ defaults = {
                  '-ldc1394 -ldl -lX11 -lXext -lraw1394 -ltheora '
                  '-lvorbisenc -lavutil -lvorbis -lm -logg')
         },
-    'directshow': {'cflags': '', 'libs': ''},
+
     'libofa': {
         'cflags': '',
         'libs': '-lofa'
         },
+
+    'directshow': {
+        'cflags': '',
+        'libs': ''
+        },
+
 }
+
 cfg = RawConfigParser()
 for section, values in defaults.items():
     cfg.add_section(section)
