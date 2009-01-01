@@ -102,6 +102,8 @@ def create_fingerprint(filename):
         raise IOError("Could not decode file '%s' with any of the available decoders: %s." %
                       (filename, ','.join(x.__name__.split('.')[-1] for x in _decoders)))
 
+
+
     # Create the fingerprint.
     #
     # Note(1):
@@ -125,7 +127,9 @@ def create_fingerprint(filename):
     #
     #  I have made this optional: if Mutagen is installed, use it otherwise
     #  don't.
-    #
+
+    # Use mutagen's duration count only if available and if it supports the file
+    # type.
     buffer, samples, sample_rate, stereo, duration = result
     if MutagenFile is not None:
         mutagenfile = MutagenFile(filename)
