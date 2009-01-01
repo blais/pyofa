@@ -29,9 +29,12 @@ except ImportError:
     from elementtree.ElementTree import iterparse
     from elementtree.ElementPath import Path
 
-from mutagen import File
+try:
+    from mutagen import File as MutagenFile
+except ImportError:
+    MutagenFile = None
 
-
+    
 __version__ = '1.0.3' # 2008-10-06
 
 __all__ = ('initialize', 'finalize',
@@ -101,18 +104,33 @@ def create_fingerprint(filename):
 
     # Create the fingerprint.
     #
-    # Note: the computed duration is typically incorrect. Use mutagen instead to
-    # get the duration. If we could fix this in ffmpeg, we would not need the
-    # dependency on mutagen.
-    buffer, samples, sample_rate, stereo, _duration = result
-    mutagenfile = File(filename)
-    if not mutagenfile:
-	# This is what should happen, actually:
-        #  raise Warning, "Mutagen does not support file %r,
-        #                   cannot determine duration"%filename
-	duration = -1
-    else:
-	duration = mutagenfile.info.length * 1000
+    # Note(1):
+    #
+    #  The computed duration is typically incorrect. Use mutagen instead to
+    #  get the duration. If we could fix this in ffmpeg, we would not need the
+    #  dependency on mutagen.
+    #
+    # Note(2) from Andrew Gee <andrew@webspot.co.uk>:
+    #
+    #  The duration that ffmpeg produces isn't as accurate as mutagen. But I 
+    #  have been testing pyofa without mutagen, and the ffmpeg calculated 
+    #  duration is working fine to calculate the PUID. So I can't really see 
+    #  this is a problem.
+    #  
+    #  The good thing about the changes is that there will be no longer a 
+    #  dependency on mutagen and more formats will be able to be read (WAV and 
+    #  FLAC).
+    #
+    # Note(3) from blais@furius.ca:
+    #
+    #  I have made this optional: if Mutagen is installed, use it otherwise
+    #  don't.
+    #
+    buffer, samples, sample_rate, stereo, duration = result
+    if MutagenFile is not None:
+        mutagenfile = MutagenFile(filename)
+        if bool(mutagenfile):
+            duration = mutagenfile.info.length * 1000
 
     fingerprint = ofa.create_print(buffer, samples, sample_rate, stereo)
     return fingerprint, int(duration)
