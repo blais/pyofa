@@ -101,7 +101,7 @@ def process_dir(dn, musicdns_key):
                 artist=True,
                 tracks=True,
                 urlRelations=True,
-                labels=True,
+                #labels=True,
                 )
             releaseids = sorted(matchrel.iteritems(), key=itemgetter(1), reverse=1)
             releases = [(q.getReleaseById(rid, i), freq) for rid, freq in releaseids]
