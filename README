@@ -32,6 +32,19 @@ Dependencies
 - python-mutagen
 - libavcodec (FFMPEG)
 
+On Ubuntu, this means installing the following packages (9.04, updated
+on [2009-05-13])::
+
+  pkg-config
+  python-mutagen
+  libavcodec-dev
+  libavformat-dev
+  liba52-dev
+  libmp3lame-dev
+  libx264-dev
+  libxvidcore-dev
+
+
 MusicDNS Key
 ------------
 
@@ -72,7 +85,7 @@ In order for this to work, it should say "yes" for both ofa and
 avcodec. Then, to build and install::
 
   python setup.py build_ext --inplace
-  python setup.py install 
+  python setup.py install
 
 or to build an RPM (with AVCodec/FFMPEG and OFA enabled)::
 

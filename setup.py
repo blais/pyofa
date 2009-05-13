@@ -23,7 +23,7 @@ defaults = {
     # Note: you may have to customize some of the flags below for your
     # specific installation and support requirements.
     'avcodec': {
-        'cflags': '-I/usr/include/ffmpeg',
+        'cflags': '-I/usr/include/ffmpeg -I/usr/include/libavcodec -I/usr/include/libavformat',
         'libs': ('-pthread -lavformat -lavcodec -lz -la52 '
                  '-lfaac -lfaad -lgsm -lmp3lame -lx264 -lxvidcore '
                  '-ldc1394 -ldl -lX11 -lXext -lraw1394 -ltheora '
