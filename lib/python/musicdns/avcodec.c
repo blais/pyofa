@@ -279,7 +279,7 @@ decode(PyObject *self, PyObject *args)
         data = packet.data;
 
         while (size > 0) {
-            len = avcodec_decode_audio(codec_context, (int16_t *)buffer_ptr, &output_size, data, size);
+            len = avcodec_decode_audio2(codec_context, (int16_t *)buffer_ptr, &output_size, data, size);
 
             if (len < 0)
                 break;
