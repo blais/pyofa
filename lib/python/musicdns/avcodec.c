@@ -24,8 +24,13 @@
 #define inline __inline
 #endif
 
+#ifdef USE_OLD_FFMPEG_LOCATIONS
 #include <avcodec.h>
 #include <avformat.h>
+#else
+#include <libavcodec/avcodec.h>
+#include <libavformat/avformat.h>
+#endif
 #include <Python.h>
 
 #ifdef _WIN32
@@ -279,6 +284,7 @@ decode(PyObject *self, PyObject *args)
         data = packet.data;
 
         while (size > 0) {
+            output_size = buffer_size + AVCODEC_MAX_AUDIO_FRAME_SIZE;
             len = avcodec_decode_audio2(codec_context, (int16_t *)buffer_ptr, &output_size, data, size);
 
             if (len < 0)
