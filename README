@@ -67,9 +67,7 @@ Download
 
 A Mercurial repository can be found at:
 
-  https://hg.furius.ca/public/pyofa/
-
-`Click here for download instructions. </web-furius/downloading.html>`_
+  http://bitbucket.org/blais/pyofa
 
 
 
@@ -115,6 +113,3 @@ Martin Blais <blais@furius.ca>
    Lukáš is the author of the great majority of the code, I just
    repackaged and simplified it outside of Picard because I wanted to
    write scripts using MusicDNS without a GUI application.
-
-
-

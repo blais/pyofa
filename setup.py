@@ -194,6 +194,7 @@ args = {
     'version': read_version(),
     'description': 'A Python wrapper for MusicDNS.',
     'url': 'http://furius.ca/pyofa',
+    'download_url': 'http://bitbucket.org/blais/pyofa',
     'author': "Martin Blais",
     'author_email': "blais@furius.ca",
     'package_dir': {'': 'lib/python'},
@@ -206,4 +207,3 @@ args = {
 }
 
 setup(**args)
-
