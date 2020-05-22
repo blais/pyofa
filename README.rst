@@ -67,7 +67,7 @@ Download
 
 A Mercurial repository can be found at:
 
-  http://bitbucket.org/blais/pyofa
+  http://github.com/blais/pyofa
 
 
 
